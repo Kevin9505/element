@@ -48,6 +48,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
   </div>
 ```
 ```css
+  // css 样式
   .detail {
     width: 100%;
     height: 100%;
