@@ -53,5 +53,17 @@ body {
   width: 100%;
   line-height: 1;
   flex-wrap: 200;
-  font-family: 'PingFang SC','STHeitiSC-Light',Arial, Helvetica, sans-serif
+  font-family: 'PingFang SC', 'STHeitiSC-Light', Arial, Helvetica, sans-serif
+}
+
+.clearfix {
+  &::after {
+    content: " ";
+    height: 0px;
+    // width: 0px;
+    line-height: 0px;
+    visibility: hidden;
+    clear: both;
+    display: block;
+  }
 }

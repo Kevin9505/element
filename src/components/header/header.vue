@@ -1,6 +1,7 @@
 <template>
   <div class="header">
     <div class="content-wrapper">
+      <!-- 头像 -->
       <div class="avator">
         <img
           width="64"
@@ -9,6 +10,7 @@
           alt=""
         >
       </div>
+      <!-- 右侧内容区 -->
       <div class="content">
         <div class="title">
           <span class="brand"></span>
@@ -30,15 +32,44 @@
       <div
         v-if="seller.supports"
         class="supports-count"
+        @click="detailShow=!detailShow"
       >
         <span>{{seller.supports.length}}个</span>
         <i class="icon-keyboard_arrow_right"></i>
       </div>
     </div>
-    <div class="bullentin-wrapper">
+    <!-- 公告 -->
+    <div
+      class="bullentin-wrapper"
+      @click="detailShow=!detailShow"
+    >
       <span class="bullentin-icon"></span>
       <span class="bullentin-content">{{seller.bulletin}}</span>
       <i class="icon-keyboard_arrow_right"></i>
+    </div>
+    <div class="background">
+      <img
+        :src="seller.avatar"
+        alt=""
+        width="100%"
+      >
+    </div>
+    <!-- 浮层 -->
+    <div
+      v-show="detailShow"
+      class="detail clearfix"
+    >
+      <div class="detail-wrapper">
+        <div class="detail-main">
+
+        </div>
+      </div>
+      <div
+        class="detail-close"
+        @click="detailShow=!detailShow"
+      >
+        <i class="icon-close"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -52,9 +83,12 @@ export default {
   },
   data () {
     return {
-      // 根据不同的type显示不同的图标
-      classMap: ['decrease', 'discount', 'guarantee', 'invoice', 'special']
+      detailShow: false
     }
+  },
+  created () {
+    // 根据不同的type显示不同的图标
+    this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special']
   }
 }
 </script>
@@ -65,7 +99,9 @@ export default {
   height: 134px;
   width: 100%;
   color: #fff;
-   background-color: rgba(7, 17, 27, 0.5);
+  overflow: hidden;
+  position: relative;
+  background-color: rgba(7, 17, 27, 0.5);
   .content-wrapper {
     height: 106px;
     display: flex;
@@ -156,25 +192,59 @@ export default {
     padding: 0 12px;
     display: flex;
     align-items: center;
-    overflow: hidden;
     background-color: rgba(0, 0, 0, 0.2);
-    .bullentin-icon{
+    .bullentin-icon {
       width: 22px;
       height: 12px;
       float: left;
-      @include bg-img('./bulletin');
+      @include bg-img("./bulletin");
       background-size: 22px 12px;
     }
-    .bullentin-content{
+    .bullentin-content {
       margin-left: 4px;
-      width: 94%;
+      width: 93%;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-    .icon-keyboard_arrow_right{
+    .icon-keyboard_arrow_right {
       overflow: hidden;
-      width: 16px;
+    }
+  }
+  .background {
+    width: 100%;
+    position: absolute;
+    top: 0%;
+    left: 0px;
+    z-index: -1;
+    filter: blur(1px);
+  }
+  .detail {
+    width: 100%;
+    height: 100%;
+    // 如果内容太长,会显示滚动条
+    overflow: auto;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 100;
+    background-color: rgba(7, 17, 27, 0.8);
+    .detail-wrapper {
+      // 如果内容不够长时,也保证有全屏长度
+      min-height: 100%;
+      .detail-main {
+        // 保证内容区域的底部有50px的空白
+        padding-bottom: 64px;
+      }
+    }
+    .detail-close {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      clear: both;
+      font-size: 32px;
+      // 让关闭按钮向 detail-wraaper 里面伸入50px
+      margin: -64px auto 0 auto;
     }
   }
 }
