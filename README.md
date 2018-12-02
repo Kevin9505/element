@@ -94,9 +94,10 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 
     把半星放到数组里面  if( half ) { arr_star.push( "half" ) }  //half是半星图片的名字
 
-    把灰色星星放到数组里面  if( arr_star.length < 5) { 
+    把灰色星星放到数组里面  
+    if( arr_star.length < 5) { 
 
-                  for( var i=0;i<(5-arr_star.length) ; i++ ){  arr_star.push( "off" ) }   //off是灰色星星的名字
+      for( var i=0;i<(5-arr_star.length) ; i++ ){  arr_star.push( "off" ) }   //off是灰色星星的名字
 
 
 ```html
