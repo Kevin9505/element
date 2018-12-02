@@ -61,7 +61,9 @@
     >
       <div class="detail-wrapper">
         <div class="detail-main">
-
+          <div class="main-top">
+            <h1 class="name">{{seller.name}}</h1>
+          </div>
         </div>
       </div>
       <div
@@ -235,6 +237,15 @@ export default {
       .detail-main {
         // 保证内容区域的底部有50px的空白
         padding-bottom: 64px;
+        .main-top{
+          padding-top: 64px;
+          .name{
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 16px;
+            text-align: center;
+          }
+        }
       }
     }
     .detail-close {
