@@ -63,6 +63,41 @@
         <div class="detail-main">
           <div class="main-top">
             <h1 class="name">{{seller.name}}</h1>
+            <star
+              class="star"
+              :size="48"
+              :score="seller.score"
+            ></star>
+          </div>
+          <div
+            class="mian-discountsInfo"
+            v-if="seller.supports"
+          >
+            <div class="discounts-title">
+              <span class="middle-line"></span>
+              <h2>优惠信息</h2>
+              <span class="middle-line"></span>
+            </div>
+            <ul class="discounts-content">
+              <li
+                v-for="item in seller.supports"
+                :key="item.index"
+              >
+                <span
+                  class="discounts-icon"
+                  :class="classMap[item.type]"
+                ></span>
+                <span class="discounts-text">{{item.description}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="seller-bulletin">
+            <div class="discounts-title">
+              <span class="middle-line"></span>
+              <h2>商家公告</h2>
+              <span class="middle-line"></span>
+            </div>
+            <p class="bulletin-content">{{seller.bulletin}}</p>
           </div>
         </div>
       </div>
@@ -77,6 +112,9 @@
 </template>
 
 <script>
+// 引入星星组件
+import star from '../star/star.vue'
+
 export default {
   props: {
     seller: {
@@ -91,12 +129,36 @@ export default {
   created () {
     // 根据不同的type显示不同的图标
     this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special']
+  },
+  // 注册组件
+  components: {
+    star
   }
 }
 </script>
 
 <style lang="scss" scoped>
 @import "@/common/scss/fun.scss";
+@mixin title {
+  .discounts-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    .middle-line {
+      height: 2px;
+      width: 112px;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    h2 {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 14px;
+      width: 60px;
+      color: rgb(255, 255, 255);
+      padding: 0px 12px;
+    }
+  }
+}
 .header {
   height: 134px;
   width: 100%;
@@ -234,16 +296,71 @@ export default {
     .detail-wrapper {
       // 如果内容不够长时,也保证有全屏长度
       min-height: 100%;
+      padding: 0 36px;
       .detail-main {
         // 保证内容区域的底部有50px的空白
         padding-bottom: 64px;
-        .main-top{
+        .main-top {
           padding-top: 64px;
-          .name{
+          margin-bottom: 28px;
+          .name {
             font-size: 16px;
             font-weight: 700;
             line-height: 16px;
             text-align: center;
+            margin-bottom: 16px;
+          }
+          .star {
+            display: flex;
+            justify-content: center;
+          }
+        }
+        .mian-discountsInfo {
+          @include title;
+          margin-bottom: 28px;
+          .discounts-content {
+            li {
+              display: flex;
+              margin-bottom: 12px;
+              padding-left: 12px;
+              .discounts-icon {
+                width: 12px;
+                height: 12px;
+                margin-right: 4px;
+                display: inline-block;
+                background-size: 12px 12px;
+                background-repeat: no-repeat;
+                &.decrease {
+                  @include bg-img("./decrease_1");
+                }
+                &.discount {
+                  @include bg-img("./discount_1");
+                }
+                &.guarantee {
+                  @include bg-img("./guarantee_1");
+                }
+                &.invoice {
+                  @include bg-img("./invoice_1");
+                }
+                &.special {
+                  @include bg-img("./special_1");
+                }
+              }
+              .discounts-text {
+                font-size: 12px;
+                color: rgb(255, 255, 255);
+                line-height: 12px;
+              }
+            }
+          }
+        }
+        .seller-bulletin{
+          @include title;
+          .bulletin-content{
+            font-size: 12px;
+            color: #fff;
+            line-height: 24px;
+            padding: 0 12px;
           }
         }
       }
