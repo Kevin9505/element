@@ -25,46 +25,49 @@
       ref="foodsWrapper"
     >
       <ul>
-        <li>1</li>
-        <li>2</li>
-        <li>3</li>
-        <li>4</li>
-        <li>5</li>
-        <li>6</li>
-        <li>7</li>
-        <li>8</li>
-        <li>9</li>
-        <li>10</li>
-        <li>11</li>
-        <li>12</li>
-        <li>13</li>
-        <li>14</li>
-        <li>15</li>
-        <li>16</li>
-        <li>17</li>
-        <li>18</li>
-        <li>19</li>
-        <li>20</li>
-        <li>21</li>
-        <li>22</li>
-        <li>23</li>
-        <li>24</li>
-        <li>25</li>
-        <li>26</li>
-        <li>27</li>
-        <li>28</li>
-        <li>29</li>
-        <li>30</li>
-        <li>31</li>
-        <li>32</li>
-        <li>33</li>
-        <li>34</li>
-        <li>35</li>
-        <li>36</li>
-        <li>37</li>
-        <li>38</li>
-        <li>39</li>
-        <li>40</li>
+        <li
+          v-for="item in goods"
+          :key="item.index"
+          class="food-list foodlist-list-hook"
+        >
+          <h1 class="title">{{item.name}}</h1>
+          <ul>
+            <li
+              class="food-item border-1px"
+              v-for="food in item.foods"
+              :key="food.index"
+            >
+              <div class="food-img">
+                <img
+                  :src="food.icon"
+                  width="57"
+                  height="57"
+                  alt=""
+                >
+              </div>
+              <div class="food-content">
+                <h2 class="food-name">{{food.name}}</h2>
+                <span class="food-description">{{food.description}}</span>
+                <div class="food-sell">
+                  <span class="sellCount">月售{{food.sellCount}}</span><span class="rating">好评率{{food.rating}}%</span>
+                </div>
+                <div class="tool-wrapper">
+                  <div class="price">
+                    <span class="newPrice"><i>￥</i>{{food.price}}</span><span
+                      v-show="food.oldPrice"
+                      class="oldPrice"
+                    ><i>￥</i>{{food.oldPrice}}</span>
+                  </div>
+                  <div class="cartcontrol-wrapper">
+                    <!-- <span class="reduce">-</span>
+                    <span class="count-number"></span>
+                    <span class="increase">+</span> -->
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </li>
       </ul>
     </div>
   </div>
@@ -167,6 +170,88 @@ export default {
   }
   .foods-wrapper {
     flex: 1;
+    ul {
+      .food-list {
+        .title {
+          height: 26px;
+          font-size: 12px;
+          color: rgb(147, 153, 159);
+          line-height: 26px;
+          padding-left: 14px;
+          border-left: 2px solid #d9dde1;
+          background-color: #f3f5f7;
+        }
+        ul {
+          .food-item {
+            // margin: 0 18px;
+            margin-left: 18px;
+            padding: 18px 18px 18px 0;
+            display: flex;
+            box-sizing: border-box;
+            @include border-1px(rgba(7, 17, 27, 0.1));
+            // .food-img{}
+            .food-content {
+              padding-left: 10px;
+              .food-name {
+                font-size: 14px;
+                margin-bottom: 8px;
+                color: rgb(7, 17, 27);
+              }
+              .food-description {
+                width: 90%;
+                display: block;
+                font-size: 10px;
+                line-height: 10px;
+                margin-bottom: 8px;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                color: rgb(147, 153, 159);
+              }
+              .food-sell {
+                font-size: 10px;
+                line-height: 10px;
+                margin-bottom: 8px;
+                color: rgb(147, 153, 159);
+                // .sellCount{}
+              }
+              .tool-wrapper {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                .price {
+                  .newPrice {
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: rgb(240, 24, 1);
+                    i {
+                      font-size: 10px;
+                      font-weight: normal;
+                      font-style: normal;
+                    }
+                  }
+                  .oldPrice {
+                    font-size: 10px;
+                    line-height: 24px;
+                    font-weight: 700;
+                    margin-left: 8px;
+                    color: rgb(147, 153, 159);
+                    i {
+                      font-weight: normal;
+                      font-style: normal;
+                    }
+                  }
+                }
+                // .cartcontrol-wrapper{
+                  // .reduce{}
+                  // .count-number{}
+                  // .increase{}
+                // }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 </style>
