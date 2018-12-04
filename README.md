@@ -139,23 +139,26 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
         // 星星的数组
         let result = []
         // 把数组处理成在4.5以及以上就想上取整6,在4.5以下就变成4.5
-        let score = Math.floor(this.score * 2)
+        let score = Math.floor(this.score * 2) / 2
+        console.log(score)
         // 判断是否有小数点
-        let hasDecimal = score % 1 !== 0
+        let hasDecimal = score % 2 === 0
         // 求整数
         let integer = Math.floor(score)
         // 循环遍历,追加全星个数
         for (let i = 0; i < integer; i++) {
           result.push(CLS_ON)
         }
+        console.log(hasDecimal)
         // 追加半星
-        if (hasDecimal) {
+        if (!hasDecimal) {
           result.push(CLS_HALF)
         }
         // 当没有满5星就用灰色的星星补齐
         while (result.length < LENGTH) {
           result.push(CLS_OFF)
         }
+        console.log(result)
         return result
       }
     }
