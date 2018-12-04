@@ -7,8 +7,10 @@
       <ul>
         <li
           class="menu-item"
-          v-for="item in goods"
+          :class="{'current':currentIndex===index}"
+          v-for="(item,index) in goods"
           :key="item.index"
+          @click="selectMenu(index,$event)"
         >
           <span class="text border-1px">
             <span
@@ -26,16 +28,16 @@
     >
       <ul>
         <li
-          v-for="item in goods"
-          :key="item.index"
+          v-for="(item, index) in goods"
+          :key="index"
           class="food-list foodlist-list-hook"
         >
           <h1 class="title">{{item.name}}</h1>
           <ul>
             <li
               class="food-item border-1px"
-              v-for="food in item.foods"
-              :key="food.index"
+              v-for="(food, index) in item.foods"
+              :key="index"
             >
               <div class="food-img">
                 <img
@@ -75,13 +77,15 @@
 
 <script>
 import BScroll from 'better-scroll'
-const errOk = 0
+const errOk = 0 // 常量,方便解耦
 export default {
   name: 'goods',
   data () {
     return {
       goods: [],
-      classMap: []
+      // classMap: [],
+      listHeight: [], // 用来存储 foods区域的各个区块的高度(clientHeight)
+      scrollY: 0 // 用来存储foods区域的滚动的 y 坐标
     }
   },
   props: {
@@ -90,24 +94,114 @@ export default {
     }
   },
   created () {
-    this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special']
-  },
-  mounted () {
+    (this.classMap = [
+      'decrease',
+      'discount',
+      'guarantee',
+      'invoice',
+      'special'
+    ])
     // 发请求获取商品数据
     this.$http.get('/api/goods').then(response => {
-      if (response.body.errno === errOk) {
-        this.goods = response.body.data
+      response = response.body
+      if (response.errno === errOk) {
+        this.goods = response.data
+        this.$nextTick(() => {
+          this._initScroll()
+          this._calculateHeight()
+        })
       }
       console.log(this.goods)
     })
-    this.$nextTick(() => {
-      let bscrollDom = this.$refs['menuWrapper']
-      this.aBscroll = new BScroll(bscrollDom, {})
-    })
-    this.$nextTick(() => {
-      let bscrollDom = this.$refs['foodsWrapper']
-      this.aBscroll = new BScroll(bscrollDom, {})
-    })
+  },
+  methods: {
+    /**
+     * 关于在selectMenu中点击,在pc界面会出现两次事件,在移动端就只出现一次事件的问题:
+     * 原因: bsScrooler会监听事件(例如touchmove,click之类),并且阻止默认事件(prevent stop),
+     * 并且他只会监听移动端的,pc端的没有监听在pc页面上 bsScroller也派发了一次click事件,原生也派发了一次click事件
+     * 解决: 针对bsScroole的事件,有_constructed: true,所以做处理,return掉非bsScroll的事件
+     */
+    // 选中的菜单
+    selectMenu (index, event) {
+      console.log(index)
+      // 去掉自带的click事件点击,即pc端直接返回
+      if (!event._constructed) {
+        return
+      }
+      let foodList = this.$refs.foodsWrapper.getElementsByClassName(
+        'foodlist-list-hook'
+      )
+      let el = foodList[index]
+      /**
+       * scrollToElement()：是better-scroll中的方法，滚动到某个元素，el（必填）表示 dom 元素，time 表示动画时间，
+       * offsetX 和 offsetY 表示坐标偏移量，easing 表示缓动函数
+       */
+      // 类似jump to 的功能,通过这个方法,跳转到指定的dom
+      this.foodsScroll.scrollToElement(el, 500)
+    },
+    _initScroll () {
+      // 初始化scroll区域
+      this.meunScroll = new BScroll(this.$refs.menuWrapper, {
+        click: true // beeter-scroll 取消默认事件,我们这里再派发一个点击1事件
+      })
+      // 结合 BScroll 的接口使用,3实时派发scroll事件
+      this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+        click: true,
+        probeType: 3 // beeter-scroll 探针
+      })
+      // 结合 BScroll 的接口使用,监听 scroll 事件(实时派发的),并获取鼠标的坐标
+      this.foodsScroll.on('scroll', pos => {
+        // 滚动坐标会出现负的,并且是小数,所以需要处理一下
+        this.scrollY = Math.abs(Math.round(pos.y))
+      })
+    },
+    // 计算 foods 内部块的高度
+    _calculateHeight () {
+      // 获取每一个 food 的dom
+      let foodList = this.$refs.foodsWrapper.getElementsByClassName('foodlist-list-hook')
+      let height = 0
+      // 初始化第一个高度为 0
+      this.listHeight.push(height)
+      for (let i = 0; i < foodList.length; i++) {
+        // 每一个 item 都是刚才获取的 food 的每一个 dom
+        let item = foodList[i]
+        // 只要是为了获取每一个 foods 内部块的高度
+        height += item.clientHeight
+        this.listHeight.push(height)
+      }
+    },
+    _drop (target) {
+      this.$nextTick(() => {
+        this.$resf.shopcart.drop(target)
+      })
+    }
+  },
+  computed: {
+    // 计算到达哪个区域的区间时候的对应的索引值
+    currentIndex () {
+      for (let i = 0; i < this.listHeight.length; i++) {
+        // 当前menu子块的高度
+        let height1 = this.listHeight[i]
+        // 下一个 menu 子块的高度
+        let height2 = this.listHeight[i + 1]
+        // 滚到底部时,height2 为 undefined,需要考虑这种情况
+        // 需要确定是在两个 menu 子块的高度区间
+        if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
+          // 返回这个 menu 子块的索引
+          return i
+        }
+      }
+    }
+  },
+  mounted () {
+    // this.$nextTick(() => {
+    //   let bscrollDom = this.$refs['menuWrapper']
+    //   this.aBscroll = new BScroll(bscrollDom, {})
+    // })
+    // this.$nextTick(() => {
+    //   let bscrollDom = this.$refs['foodsWrapper']
+    //   this.aBscroll = new BScroll(bscrollDom, {})
+    // })
   }
 }
 </script>
@@ -127,7 +221,6 @@ export default {
     width: 80px;
     background-color: #f3f5f7;
     ul {
-      padding: 0px 12px;
       .menu-item {
         height: 54px;
         width: 56px;
@@ -135,7 +228,15 @@ export default {
         align-items: center;
         line-height: 14px;
         font-size: 0px;
+        padding: 0px 12px;
         @include border-1px(rgba(7, 17, 27, 0.1));
+        &.current { /* 菜单选中的样式 */
+          position: relative;
+          z-index: 10;
+          margin-top: -1px;
+          background-color: #fff;
+          font-weight: 700;
+        }
         .text {
           font-size: 12px;
           color: rgb(22, 22, 22);
@@ -242,9 +343,9 @@ export default {
                   }
                 }
                 // .cartcontrol-wrapper{
-                  // .reduce{}
-                  // .count-number{}
-                  // .increase{}
+                // .reduce{}
+                // .count-number{}
+                // .increase{}
                 // }
               }
             }
