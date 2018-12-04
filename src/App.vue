@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!-- <div class="top"> -->
     <v-header :seller="seller" />
     <div class="tab border-1px">
       <div class="tab-item">
@@ -21,12 +22,14 @@
         >商家</router-link>
       </div>
     </div>
+    <!-- </div> -->
     <router-view />
     <!-- <router-view></router-view> -->
   </div>
 </template>
 
 <script>
+// import BScroll from 'better-scroll'
 import header from '@/components/header/header.vue'
 
 const errOk = 0
@@ -46,8 +49,12 @@ export default {
       if (response.body.errno === errOk) {
         this.seller = response.body.data
       }
-      console.log(this.seller)
+      // console.log(this.seller)
     })
+    // this.$nextTick(() => {
+    //   let bscrollDom = this.$refs.bscroll
+    //   this.aBscroll = new BScroll(bscrollDom, {})
+    // })
   }
 }
 </script>
@@ -56,14 +63,14 @@ export default {
 @import "@/common/scss/fun.scss";
 #app {
   /* background-color: #f3f5f7; */
-  // height: 100%;
-  // width: 100%;
+  height: 100%;
   .tab {
     display: flex;
     align-items: center;
     height: 40px;
     line-height: 40px;
     box-sizing: border-box;
+    background-color: #fff;
     @include border-1px(rgba(7, 17, 27, 0.1));
     .tab-item {
       flex: 1;

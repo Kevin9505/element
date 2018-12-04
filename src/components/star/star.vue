@@ -36,7 +36,7 @@ export default {
       let result = []
       // 把数组处理成在4.5以及以上就想上取整6,在4.5以下就变成4.5
       let score = Math.floor(this.score * 2) / 2
-      console.log(score)
+      // console.log(score)
       // 判断是否有小数点
       let hasDecimal = score % 2 === 0
       // 求整数
@@ -45,7 +45,7 @@ export default {
       for (let i = 0; i < integer; i++) {
         result.push(CLS_ON)
       }
-      console.log(hasDecimal)
+      // console.log(hasDecimal)
       // 追加半星
       if (!hasDecimal) {
         result.push(CLS_HALF)
@@ -54,7 +54,7 @@ export default {
       while (result.length < LENGTH) {
         result.push(CLS_OFF)
       }
-      console.log(result)
+      // console.log(result)
       return result
     }
   }
