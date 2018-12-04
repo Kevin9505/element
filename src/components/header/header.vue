@@ -55,59 +55,62 @@
       >
     </div>
     <!-- 浮层 -->
-    <div
-      v-show="detailShow"
-      class="detail clearfix"
-    >
-      <div class="detail-wrapper">
-        <div class="detail-main">
-          <div class="main-top">
-            <h1 class="name">{{seller.name}}</h1>
-            <star
-              class="star"
-              :size="48"
-              :score="seller.score"
-            ></star>
-          </div>
-          <div
-            class="mian-discountsInfo"
-            v-if="seller.supports"
-          >
-            <div class="discounts-title">
-              <span class="middle-line"></span>
-              <h2>优惠信息</h2>
-              <span class="middle-line"></span>
+    <transition name="fade">
+      <div
+        v-show="detailShow"
+        class="detail fade-transition"
+        transition="fade"
+      >
+        <div class="detail-wrapper clearfix">
+          <div class="detail-main">
+            <div class="main-top">
+              <h1 class="name">{{seller.name}}</h1>
+              <star
+                class="star"
+                :size="48"
+                :score="seller.score"
+              ></star>
             </div>
-            <ul class="discounts-content">
-              <li
-                v-for="item in seller.supports"
-                :key="item.index"
+            <div class="mian-discountsInfo">
+              <div class="discounts-title">
+                <div class="middle-line"></div>
+                <h2>优惠信息</h2>
+                <div class="middle-line"></div>
+              </div>
+              <ul
+                class="discounts-content"
+                v-if="seller.supports"
               >
-                <span
-                  class="discounts-icon"
-                  :class="classMap[item.type]"
-                ></span>
-                <span class="discounts-text">{{item.description}}</span>
-              </li>
-            </ul>
-          </div>
-          <div class="seller-bulletin">
-            <div class="discounts-title">
-              <span class="middle-line"></span>
-              <h2>商家公告</h2>
-              <span class="middle-line"></span>
+                <li
+                  v-for="item in seller.supports"
+                  :key="item.index"
+                >
+                  <span
+                    class="discounts-icon"
+                    :class="classMap[item.type]"
+                  ></span>
+                  <span class="discounts-text">{{item.description}}</span>
+                </li>
+              </ul>
             </div>
-            <p class="bulletin-content">{{seller.bulletin}}</p>
+            <div class="seller-bulletin">
+              <div class="discounts-title">
+                <span class="middle-line"></span>
+                <h2>商家公告</h2>
+                <span class="middle-line"></span>
+              </div>
+              <p class="bulletin-content">{{seller.bulletin}}</p>
+            </div>
           </div>
         </div>
+        <div
+          class="detail-close"
+          @click="detailShow=!detailShow"
+        >
+          <i class="icon-close"></i>
+        </div>
       </div>
-      <div
-        class="detail-close"
-        @click="detailShow=!detailShow"
-      >
-        <i class="icon-close"></i>
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -142,18 +145,18 @@ export default {
 @mixin title {
   .discounts-title {
     display: flex;
+    width: 100%;
     align-items: center;
+    margin: 0 auto;
     margin-bottom: 24px;
     .middle-line {
-      height: 2px;
-      width: 112px;
-      background-color: rgba(255, 255, 255, 0.2);
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
     h2 {
       font-size: 14px;
       font-weight: 700;
       line-height: 14px;
-      width: 60px;
       color: rgb(255, 255, 255);
       padding: 0px 12px;
     }
@@ -292,11 +295,22 @@ export default {
     top: 0px;
     left: 0px;
     z-index: 100;
-    background-color: rgba(7, 17, 27, 0.8);
+    transition: all 0.5s;
+    backdrop-filter: blur(10px);
+    &.fade-transition {
+      opacity: 1;
+      transition: all 0.5s;
+      background-color: rgba(7, 17, 27, 0.8);
+    }
+    &.fade-enter,
+    &.fade-leave {
+      opacity: 0;
+      background-color: rgba(7, 17, 27, 0);
+    }
     .detail-wrapper {
       // 如果内容不够长时,也保证有全屏长度
       min-height: 100%;
-      padding: 0 36px;
+      // padding: 0 36px;
       .detail-main {
         // 保证内容区域的底部有50px的空白
         padding-bottom: 64px;
@@ -317,18 +331,21 @@ export default {
         }
         .mian-discountsInfo {
           @include title;
+          width: 80%;
+          margin: 0 auto;
           margin-bottom: 28px;
           .discounts-content {
             li {
               display: flex;
+              align-items: center;
               margin-bottom: 12px;
               padding-left: 12px;
               .discounts-icon {
-                width: 12px;
-                height: 12px;
+                width: 16px;
+                height: 16px;
                 margin-right: 4px;
                 display: inline-block;
-                background-size: 12px 12px;
+                background-size: 16px 16px;
                 background-repeat: no-repeat;
                 &.decrease {
                   @include bg-img("./decrease_1");
@@ -349,14 +366,16 @@ export default {
               .discounts-text {
                 font-size: 12px;
                 color: rgb(255, 255, 255);
-                line-height: 12px;
+                // line-height: 16px;
               }
             }
           }
         }
-        .seller-bulletin{
+        .seller-bulletin {
           @include title;
-          .bulletin-content{
+          width: 80%;
+          margin: 0 auto;
+          .bulletin-content {
             font-size: 12px;
             color: #fff;
             line-height: 24px;
