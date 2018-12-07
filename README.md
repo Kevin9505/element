@@ -276,7 +276,7 @@ better-scroll 是移动端滚动的解决方案,它基于iscroll的重写,不仅
   let scroll = new BScroll(wrapper,{})
 ```
 + better-scrool 在 vue 中使用 
-```vue
+```html
 <template>
   <div class="wrapper" ref="wrapper">
     <ul class="content">
@@ -311,7 +311,7 @@ better-scroll 是移动端滚动的解决方案,它基于iscroll的重写,不仅
 实现原理
   因为按钮菜单的个数和商品块端的个数是相等的，点击左侧按钮时获取索引，根据索引获取对应的商品区块向上滚动
 ## 页面布局
-```vue
+```html
 <template>
   <div class="goods">
     <!-- 菜单 -->
@@ -471,8 +471,8 @@ export default {
         }
       }
     }
-
-
+  }
+</script>
 
 ```
 
