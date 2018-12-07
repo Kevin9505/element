@@ -258,7 +258,223 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     }
   }
 ```
+# 商品页的滚动效果 -- better-scroll 的使用
+better-scroll 是移动端滚动的解决方案,它基于iscroll的重写,不仅可以做滚动列表还可以做轮播图，等
+`better-scroll 常见的html结构`
+```html
+<!-- wrapper 是父容器  content 是子容器  父容器中只能有一个子元素 -->
+  <div class="wrapper">
+    <ul class="content">
+      <li>...</li>
+      <li>...</li>
+      ...
+    </ul>
+  </div>
+  // better-scroll 的初始化
+  import BScroll from 'better-scroll'
+  let wrapper = document.querySelect('.wrapper')
+  let scroll = new BScroll(wrapper,{})
+```
++ better-scrool 在 vue 中使用 
+```vue
+<template>
+  <div class="wrapper" ref="wrapper">
+    <ul class="content">
+      <li v-for="(item,index) in data" :key="index">{{item}}</li>
+    </ul>
+  </div>
+</template>
+<script>
+  // 导入 better-scroll 模块
+  import BScroll from 'better-scroll'
+  export default {
+    data(){
+      return{
+        data:[]
+      }
+    },
+    // created 钩子函数 -- 在实例创建完成后被立即调用.
+    created() {
+      axios.get('/api/goods').then(res => {
+        this.data = res.data
+        //  better-scroll 初始化 this.$nextTick(()=>{  }) 是异步函数
+        this.$nextTick(() => {
+          this.scroll = new Bscroll(this.$refs.wrapper, {})
+        })
+      })
+    }
+  }
+</script>
+```
 
+# 商品页菜单按钮和商品区的联动效果
+实现原理
+  因为按钮菜单的个数和商品块端的个数是相等的，点击左侧按钮时获取索引，根据索引获取对应的商品区块向上滚动
+## 页面布局
+```vue
+<template>
+  <div class="goods">
+    <!-- 菜单 -->
+    <div
+      class="menu-wrapper"
+      ref="menuWrapper"
+    >
+      <ul>
+        <li
+          class="menu-item"
+          :class="{'current':currentIndex===index}"
+          v-for="(item,index) in goods"
+          :key="item.index"
+          @click="selectMenu(index,$event)"
+        >
+          <span class="text border-1px">
+            <span
+              class="icon"
+              :class="classMap[item.type]"
+              v-show="item.type>0"
+            ></span>{{item.name}}
+          </span>
+        </li>
+      </ul>
+    </div>
+    <!-- 商品 -->
+    <div
+      class="foods-wrapper"
+      ref="foodsWrapper"
+    >
+      <ul>
+        <!-- 商品区块 -->
+        <li
+          v-for="(item, index) in goods"
+          :key="index"
+          class="food-list foodlist-list-hook"
+        >
+          <!-- 商品区块标题 -->
+          <h1 class="title">{{item.name}}</h1>
+          <!-- 商品区块内容 -->
+          <ul>
+            <li
+              class="food-item border-1px"
+              v-for="(food, index) in item.foods"
+              :key="index"
+            >
+            ...
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+</template>
+
+<script>
+// 导入 better-scroll 模块
+import BScroll from 'better-scroll'
+const errOk = 0 // 常量,方便解耦
+export default {
+  // name: 'goods',
+  data () {
+    return {
+      goods: [], // 接收商品页的数据
+      // classMap: [],
+      listHeight: [], // 用来存储 foods区域的各个区块的高度(clientHeight)
+      scrollY: 0 // 用来存储foods区域的滚动的 y 坐标
+    }
+  },
+  created () {
+    // 当这个组件被调用时,发请求获取商品数据将数据赋值给goods
+    this.$http.get('/api/goods').then(response => { // '/api/goods/' 请求的是data.json 下的goods数组
+      response = response.body
+      if (response.errno === errOk) {
+        this.goods = response.data
+        // 可以用 $nextTick(()=>{}) 来确保 Dom 变化后再执行一些事情
+        this.$nextTick(() => {
+          this._initScroll()
+          this._calculateHeight()
+        })
+      }
+      console.log(this.goods)
+    })
+  },
+  methods: {
+    /**
+     * 关于在selectMenu中点击,在pc界面会出现两次事件,在移动端就只出现一次事件的问题:
+     * 原因: bsScrooler会监听事件(例如touchmove,click之类),并且阻止默认事件(prevent stop),
+     * 并且他只会监听移动端的,pc端的没有监听在pc页面上 bsScroller也派发了一次click事件,原生也派发了一次click事件
+     * 解决: 针对bsScroole的事件,有_constructed: true,所以做处理,return掉非bsScroll的事件
+     */
+    // 选中的菜单
+    selectMenu (index, event) {
+      console.log(index)
+      // 去掉自带的click事件点击,即pc端直接返回
+      if (!event._constructed) {
+        return
+      }
+      // 将商品区的每一个分类区块添加到数组里，
+      let foodList = this.$refs.foodsWrapper.getElementsByClassName(
+        'foodlist-list-hook'
+      )
+      // 根据左侧点击按钮获取对应的商品区块
+      let el = foodList[index]
+      /**
+       * scrollToElement()：是better-scroll中的方法，滚动到某个元素，el（必填）表示 dom 元素，time 表示动画时间，
+       * offsetX 和 offsetY 表示坐标偏移量，easing 表示缓动函数
+       */
+      // 类似jump to 的功能,通过这个方法,跳转到指定的dom
+      this.foodsScroll.scrollToElement(el, 100)
+    },
+    // 初始化scroll区域
+    _initScroll () {
+      // -- 左侧按钮
+      this.meunScroll = new BScroll(this.$refs.menuWrapper, {
+        click: true // beeter-scroll 取消默认事件,我们这里再派发一个点击事件
+      })
+      // 结合 BScroll 的接口使用,3实时派发scroll事件  --- 商品区
+      this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+        click: true,
+        probeType: 3 // beeter-scroll 探针
+      })
+      // 结合 BScroll 的接口使用,监听 scroll 事件(实时派发的),并获取鼠标的坐标
+      this.foodsScroll.on('scroll', pos => {
+        // 滚动坐标会出现负的,并且是小数,所以需要处理一下
+        this.scrollY = Math.abs(Math.round(pos.y))
+      })
+    },
+    // 计算 foods 内部块的高度
+    _calculateHeight () {
+      // 获取每一个 food 的dom
+      let foodList = this.$refs.foodsWrapper.getElementsByClassName('foodlist-list-hook')
+      let height = 0
+      // 初始化第一个高度为 0
+      this.listHeight.push(height)
+      for (let i = 0; i < foodList.length; i++) {
+        // 每一个 item 都是刚才获取的 food 的每一个 dom
+        let item = foodList[i]
+        // 只要是为了获取每一个 foods 内部块的高度
+        height += item.clientHeight
+        this.listHeight.push(height)
+      }
+    },
+    computed: {
+      // 计算到达哪个区域的区间时候的对应的索引值
+      currentIndex () {
+        for (let i = 0; i < this.listHeight.length; i++) {
+          // 当前menu子块的高度
+          let height1 = this.listHeight[i]
+          // 下一个 menu 子块的高度
+          let height2 = this.listHeight[i + 1]
+          // 滚到底部时,height2 为 undefined,需要考虑这种情况
+          // 需要确定是在两个 menu 子块的高度区间
+          if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
+            // 返回这个 menu 子块的索引
+            return i
+          }
+        }
+      }
+    }
+
+
+
+```
 
 
 
