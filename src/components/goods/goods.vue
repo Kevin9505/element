@@ -9,7 +9,7 @@
           class="menu-item"
           :class="{'current':currentIndex===index}"
           v-for="(item,index) in goods"
-          :key="item.index"
+          :key="index"
           @click="selectMenu(index,$event)"
         >
           <span class="text border-1px">
@@ -49,7 +49,7 @@
               </div>
               <div class="food-content">
                 <h2 class="food-name">{{food.name}}</h2>
-                <span class="food-description">{{food.description}}</span>
+                <span v-show="food.description" class="food-description">{{food.description}}</span>
                 <div class="food-sell">
                   <span class="sellCount">月售{{food.sellCount}}</span><span class="rating">好评率{{food.rating}}%</span>
                 </div>
@@ -76,24 +76,27 @@
 </template>
 
 <script>
+// 导入 better-scroll 模块
 import BScroll from 'better-scroll'
 const errOk = 0 // 常量,方便解耦
 export default {
-  name: 'goods',
+  // name: 'goods',
   data () {
     return {
-      goods: [],
+      goods: [], // 接收商品页的数据
       // classMap: [],
       listHeight: [], // 用来存储 foods区域的各个区块的高度(clientHeight)
       scrollY: 0 // 用来存储foods区域的滚动的 y 坐标
     }
   },
+  // 接收数据
   props: {
-    seller: {
-      type: Object
-    }
+    // seller: {
+    //   type: Object
+    // }
   },
   created () {
+    // 计算左侧菜单栏的小图标,动态添加类来控制
     (this.classMap = [
       'decrease',
       'discount',
@@ -101,17 +104,18 @@ export default {
       'invoice',
       'special'
     ])
-    // 发请求获取商品数据
-    this.$http.get('/api/goods').then(response => {
+    // 当这个组件被调用时,发请求获取商品数据将数据赋值给goods
+    this.$http.get('/api/goods').then(response => { // '/api/goods/' 请求的是data.json 下的goods数组
       response = response.body
       if (response.errno === errOk) {
         this.goods = response.data
+        // 可以用 $nextTick(()=>{}) 来确保 Dom 变化后再执行一些事情
         this.$nextTick(() => {
           this._initScroll()
           this._calculateHeight()
         })
       }
-      console.log(this.goods)
+      // console.log(this.goods)
     })
   },
   methods: {
@@ -123,26 +127,28 @@ export default {
      */
     // 选中的菜单
     selectMenu (index, event) {
-      console.log(index)
+      // console.log(index)
       // 去掉自带的click事件点击,即pc端直接返回
       if (!event._constructed) {
         return
       }
+      // 将商品区的每一个分类区块添加到数组里，
       let foodList = this.$refs.foodsWrapper.getElementsByClassName(
         'foodlist-list-hook'
       )
+      // 根据左侧点击按钮获取对应的商品区块
       let el = foodList[index]
       /**
        * scrollToElement()：是better-scroll中的方法，滚动到某个元素，el（必填）表示 dom 元素，time 表示动画时间，
        * offsetX 和 offsetY 表示坐标偏移量，easing 表示缓动函数
        */
       // 类似jump to 的功能,通过这个方法,跳转到指定的dom
-      this.foodsScroll.scrollToElement(el, 500)
+      this.foodsScroll.scrollToElement(el, 100)
     },
     _initScroll () {
       // 初始化scroll区域
       this.meunScroll = new BScroll(this.$refs.menuWrapper, {
-        click: true // beeter-scroll 取消默认事件,我们这里再派发一个点击1事件
+        click: true // beeter-scroll 取消默认事件,我们这里再派发一个点击事件
       })
       // 结合 BScroll 的接口使用,3实时派发scroll事件
       this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
@@ -169,6 +175,7 @@ export default {
         height += item.clientHeight
         this.listHeight.push(height)
       }
+      // console.log(this.listHeight)
     },
     _drop (target) {
       this.$nextTick(() => {
@@ -182,26 +189,22 @@ export default {
       for (let i = 0; i < this.listHeight.length; i++) {
         // 当前menu子块的高度
         let height1 = this.listHeight[i]
+        // console.log(height1)
         // 下一个 menu 子块的高度
         let height2 = this.listHeight[i + 1]
+        // console.log(height2)
         // 滚到底部时,height2 为 undefined,需要考虑这种情况
         // 需要确定是在两个 menu 子块的高度区间
         if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
           // 返回这个 menu 子块的索引
+          // console.log(i)
           return i
         }
       }
     }
   },
   mounted () {
-    // this.$nextTick(() => {
-    //   let bscrollDom = this.$refs['menuWrapper']
-    //   this.aBscroll = new BScroll(bscrollDom, {})
-    // })
-    // this.$nextTick(() => {
-    //   let bscrollDom = this.$refs['foodsWrapper']
-    //   this.aBscroll = new BScroll(bscrollDom, {})
-    // })
+
   }
 }
 </script>

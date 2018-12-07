@@ -25,19 +25,22 @@
     <!-- </div> -->
     <router-view />
     <!-- <router-view></router-view> -->
+    <v-shopcart></v-shopcart>
   </div>
 </template>
 
 <script>
 // import BScroll from 'better-scroll'
 import header from '@/components/header/header.vue'
+import shopcart from '@/components/shopcart/shopcart.vue'
 
 const errOk = 0
 
 export default {
   name: 'App',
   components: {
-    'v-header': header
+    'v-header': header,
+    'v-shopcart': shopcart
   },
   data () {
     return {
@@ -84,6 +87,12 @@ export default {
         color: rgb(240, 24, 20);
       }
     }
+  }
+  .shopcart{
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
   }
 }
 </style>
