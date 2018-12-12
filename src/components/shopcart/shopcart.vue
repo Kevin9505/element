@@ -1,37 +1,143 @@
 <template>
   <div class="shopcart">
-    <div class="shopcart-left-wrapper">
-      <div class="logo-wrapper">
-        <div class="logo" :class="{'highlight':totalCount>0}">
-          <i class="icon-shopping_cart shopping-icon" :class="{'highlight':totalCount>0}"></i>
+    <div class="content">
+      <div class="shopcart-left-wrapper">
+        <div class="logo-wrapper">
+          <div class="logo" :class="{'highlight':totalCount>0}" @click.stop.prevent="toggleList">
+            <i class="icon-shopping_cart shopping-icon" :class="{'highlight':totalCount>0}"></i>
+          </div>
+          <div class="total-num" v-show="totalCount>0">{{totalCount}}</div>
         </div>
-        <div class="total-num" v-show="totalCount>0">{{totalCount}}</div>
+        <div class="price" :class="{'highlight':totalPrice>0}">￥{{totalPrice}}</div>
+        <div class="desc">另需配送费 ￥{{deliveryPrice}}</div>
       </div>
-      <div class="price">￥{{totalPrice}}</div>
-      <div class="desc">另需配送费 ￥{{deliveryPrice}}</div>
-    </div>
-    <div class="shopcart-right-wrapper">
-      <div class="pay" :class="payClass">
-        ￥20起送
+      <div class="shopcart-right-wrapper">
+        <div class="pay" :class="payClass">
+          {{payDesc}}
+        </div>
       </div>
     </div>
+    <!-- 小球动画 -->
+    <!-- <div class="ball-container">
+      <div class="ball" transiton="drop" v-for="ball in balls" :key="ball.index" v-show="ball.show">
+        <div class="inner inner-hook"></div>
+      </div>
+    </div> -->
+    <!-- 购物车列表详情 -->
+    <div class="shopcart-list" v-show="listShow" ref="shopcartList" transition="fold">
+      <!-- 详情标题 -->
+      <div class="list-header">
+        <h1 class="title">购物车</h1>
+        <span class="empty">清空</span>
+      </div>
+      <!-- 详情内容 -->
+      <div class="list-content">
+        <ul>
+          <li class="food">
+            <span class="name">皮蛋瘦肉粥</span>
+            <div class="food-right">
+              <div class="price">￥<span class="total-price">10</span>
+              </div>
+              <div class="cartcontrol-wrapper">
+                <v-cartcontrol></v-cartcontrol>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="list-mask" v-show="listShow" @click.stop.prevent="listShow"></div>
   </div>
 </template>
 <script>
+// import BScroll from 'better-scroll'
+import cartcontrol from '@/components/cartcontrol/cartcontrol.vue'
 export default {
+  components: {
+    'v-cartcontrol': cartcontrol
+  },
+  // props: {
+  //   selectedFoods: {
+  //     type: Array,
+  //     default () {
+  //       return [
+  //         {
+  //           price: 10,
+  //           count: 1
+  //         }
+  //       ]
+  //     },
+  //     deliveryPrice: {
+  //       type: Number,
+  //       default: 0
+  //     },
+  //     minPrice: {
+  //       type: Number,
+  //       default: 0
+  //     }
+  //   }
+  // },
   data () {
     return {
       // 商品总数
-      totalCount: 1,
+      totalCount: 0,
       // 商品总价
-      totalPrice: 20,
-      // 起送价
+      totalPrice: 10,
+      listShow: false,
+      // fold: true,
+      // balls: [
+      //   {
+      //     show: false
+      //   },
+      //   {
+      //     show: false
+      //   },
+      //   {
+      //     show: false
+      //   },
+      //   {
+      //     show: false
+      //   },
+      //   {
+      //     show: false
+      //   }
+      // ],
+      // dropBalls: []
+      // // 起送价
       minPrice: 20,
-      // 另需配送价
+      // // 另需配送价
       deliveryPrice: 8
     }
   },
   computed: {
+    // 总价
+    // totalPrice () {
+    //   let total = 0
+    //   this.selectedFoods.forEach((food) => {
+    //     total += food.price * food.count
+    //   })
+    //   return total
+    // },
+    // 所选商品总数
+    // totalCount () {
+    //   let count = 0
+    //   this.selectedFoods.forEach((food) => {
+    //     count += food.count
+    //   })
+    //   return count
+    // },
+    // 支付的三种描述情况
+    payDesc () {
+      if (this.totalPrice === 0) {
+        return `￥${this.minPrice}元起送`
+      } else if (this.totalPrice < this.minPrice) {
+        let diff = this.minPrice - this.totalPrice
+        return `还差￥${diff}元起送`
+      } else {
+        return '去结算'
+      }
+    },
+    // 判断结算按钮是否高亮
     payClass () {
       if (this.totalPrice >= this.minPrice) {
         return 'enough'
@@ -39,99 +145,279 @@ export default {
         return 'not-enough'
       }
     }
+    // 判断购物车列表内是否有商品,再进行展开折叠
+    // show () {
+    //   if (!this.totalCount) {
+    //     // this.listShow = true
+    //     return false
+    //   }
+    //   let show = !this.listShow
+    //   if (show) {
+    //     this.$nextTick(() => {
+    //       if (!this.scroll) {
+    //         this.scroll = new BScroll(this.$refs.shopcartList, {
+    //           click: true
+    //         })
+    //       } else {
+    //         this.scroll.refresh()
+    //       }
+    //     })
+    //   }
+    //   return show
+    // }
+  },
+  methods: {
+    // 获取到点击的dom元素
+    // drop (el) {
+    //   console.log(el)
+    //   for (let i = 0; i < this.balls.length; i++) {
+    //     let ball = this.balls[i]
+    //     if (!ball.show) {
+    //       ball.show = true
+    //       ball.el = el
+    //       this.dropBalls.push(ball)
+    //     }
+    //   }
+    // },
+    // 购物车列表遮罩
+    hideList () {
+      this.listShow = false
+    },
+    // 切换购物车详情页
+    toggleList () {
+      // if (!this.totalCount) {
+      //   return
+      // }
+      this.listShow = !this.listShow
+      // this.fold = !this.fold
+    },
+    // 清空购物车
+    // empty () {
+    //   this.selectedFoods.forEach((food) => {
+    //     food.count = 0
+    //   })
+    // },
+    // 结算支付弹框
+    pay () {
+      if (this.totalPrice < this.minPrice) {
+        return
+      }
+      window.alert(`你需要支付${this.total}元`)
+    }
   }
+  // 动画函数
+  // transitions: {
+  //   drop: {
+  //     beforeEnter (el) {
+  //       let count = this.balls.length
+  //       while (count--) {
+  //         let ball = this.balls[count]
+  //         if (ball.show) {
+  //           let rect = ball.el.getBoundingClientRect()
+  //           let x = rect.left - 32
+  //           let y = -(window.innerHeight - rect.top - 22)
+  //           el.style.display = ''
+  //           el.style.webkitTransform = `translate3d(0,${y}px,0)`
+  //           el.style.transform = `translate3d(0,${y}px,0)`
+  //           let inner = el.getElementsByClassName('inner-hook')[0]
+  //           inner.style.webkitTransform = `translate3d(${x}px,0,0)`
+  //         }
+  //       }
+  //     },
+  //     enter (el) {
+  //       // let rf = el.offsetHight
+  //       this.$nextTick(() => {
+  //         el.style.webkitTransform = 'translate3d(0,0,0)'
+  //         el.style.transform = 'translate3d(0,0,0)'
+  //         let inner = el.getElementsByClassName('inner-hook')[0]
+  //         inner.style.webkitTransform = 'translate3d(0,0,0)'
+  //         inner.style.transform = 'translate(0,0,0)'
+  //       })
+  //     },
+  //     afterEnter (el) {
+  //       let ball = this.dropBalls.shift()
+  //       if (ball) {
+  //         ball.show = false
+  //         el.style.display = 'none'
+  //       }
+  //     }
+  //   }
+  // }
 }
 </script>
 <style lang="scss" scoped>
+@import '../../common/scss/fun.scss';
 .shopcart {
-  height: 48px;
-  display: flex;
-  background-color: #141d27;
-  .shopcart-left-wrapper {
-    flex: 1;
+  // width: 100%;
+  // height: 48px;
+  /* 购物车内容 */
+  .content{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    width: 100%;
+    height: 48px;
     display: flex;
-    align-items: center;
-    padding-left: 15px;
-    .logo-wrapper {
-      height: 56px;
-      width: 56px;
-      // display: inline-block;
-      position: relative;
-      bottom: 8px;
-      // background: #141d27;
-      .logo {
-        border-radius: 50%;
-        width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-        background: #2b343c;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        // background-color: rgba(0,0,0,0.2);
-        border: 6px solid #141d27;
-        &.highlight {
-          background: rgb(0, 160, 220);
-        }
-        .shopping-icon {
-          font-size: 24px;
-          line-height: 24px;
-          color: rgba(255, 255, 255, 0.4);
+    background-color: #141d27;
+    color: rgba(255, 255, 255, 0.4);
+    .shopcart-left-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding-left: 15px;
+      .logo-wrapper {
+        height: 56px;
+        width: 56px;
+        // display: inline-block;
+        position: relative;
+        bottom: 8px;
+        // background: #141d27;
+        .logo {
+          border-radius: 50%;
+          width: 100%;
+          height: 100%;
+          box-sizing: border-box;
+          background: #2b343c;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          // background-color: rgba(0,0,0,0.2);
+          border: 6px solid #141d27;
           &.highlight {
-            color: #fff;
+            background: rgb(0, 160, 220);
+          }
+          .shopping-icon {
+            font-size: 24px;
+            line-height: 24px;
+            color: rgba(255, 255, 255, 0.4);
+            &.highlight {
+              color: #fff;
+            }
+          }
+        }
+        .total-num {
+          width: 26px;
+          padding: 0 6px;
+          font-size: 9px;
+          line-height: 16px;
+          color: #fff;
+          text-align: center;
+          border-radius: 20px;
+          box-sizing: border-box;
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          z-index: 10;
+          background-color: rgb(240, 20, 20);
+          box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.4);
+        }
+      }
+      .price {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 700;
+        line-height: 24px;
+        margin-left: 18px;
+        margin-right: 12px;
+      }
+      .desc {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.4);
+        // line-height: 48px;
+      }
+    }
+    .shopcart-right-wrapper {
+      flex: 0 0 105px;
+      width: 105px;
+      .pay {
+        height: 48px;
+        line-height: 48px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 0 8px;
+        color: rgba(255, 255, 255, 0.4);
+        &.not-enough {
+          background: #2b333b;
+        }
+        &.enough {
+          background: #00b43c;
+          color: #fff;
+        }
+      }
+    }
+  }
+  /* 购物车列表 */
+  .shopcart-list{
+    height: 305px;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    z-index: 10;
+    width: 100%;
+    background-color: #fff;
+    .list-header{
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background-color: #f3f5f7;
+      @include border-1px(rgba(7,17,27,0.1));
+      .title{
+        font-size: 14px;
+        color: rgb(7, 17, 27);
+      }
+      .empty{
+        font-size: 12px;
+        color: rgb(0, 160, 220);
+      }
+    }
+    .list-content{
+      ul{
+        .food{
+          height: 48px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 18px;
+          @include border-1px(rgba(7,17,27,0.1));
+          .name{
+            font-size: 14px;
+            color: rgb(7, 17, 27);
+          }
+          .food-right{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .price{
+              font-size: 10px;
+              font-weight: normal;
+              color: rgb(240, 20, 20);
+              .total-price{
+                font-size: 14px;
+                font-weight: 700;
+              }
+            }
+            .cartcontrol-wrapper{
+              margin-left: 12px;
+            }
           }
         }
       }
-      .total-num {
-        width: 26px;
-        padding: 0 6px;
-        font-size: 9px;
-        line-height: 16px;
-        color: #fff;
-        text-align: center;
-        border-radius: 20px;
-        box-sizing: border-box;
-        position: absolute;
-        top: -2px;
-        right: -2px;
-        z-index: 10;
-        background-color: rgb(240, 20, 20);
-        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.4);
-      }
-    }
-    .price {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.4);
-      font-weight: 700;
-      line-height: 24px;
-      margin-left: 18px;
-      margin-right: 12px;
-    }
-    .desc {
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.4);
-      // line-height: 48px;
     }
   }
-  .shopcart-right-wrapper {
-    flex: 0 0 105px;
-    width: 105px;
-    .pay {
-      height: 48px;
-      line-height: 48px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 0 8px;
-      color: rgba(255, 255, 255, 0.4);
-      &.not-enough {
-        background: #2b333b;
-      }
-      &.enough {
-        background: #00b43c;
-        color: #fff;
-      }
-    }
+  /* 遮罩层 */
+  .list-mask{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 5;
+    background: rgba(7, 17, 27, 0.6);
+    backdrop-filter: blur(10px);
   }
 }
 </style>

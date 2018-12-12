@@ -24,23 +24,25 @@
     </div>
     <!-- </div> -->
     <router-view />
-    <!-- <router-view></router-view> -->
-    <v-shopcart></v-shopcart>
+    <!-- <v-shopcart
+      :delivery-price="seller.deliveryPrice"
+      :min-price="seller.minPrice"
+    ></v-shopcart> -->
   </div>
 </template>
 
 <script>
 // import BScroll from 'better-scroll'
 import header from '@/components/header/header.vue'
-import shopcart from '@/components/shopcart/shopcart.vue'
+// import shopcart from '@/components/shopcart/shopcart.vue'
 
 const errOk = 0
 
 export default {
   name: 'App',
   components: {
-    'v-header': header,
-    'v-shopcart': shopcart
+    'v-header': header
+    // 'v-shopcart': shopcart
   },
   data () {
     return {
@@ -54,10 +56,9 @@ export default {
       }
       // console.log(this.seller)
     })
-    // this.$nextTick(() => {
-    //   let bscrollDom = this.$refs.bscroll
-    //   this.aBscroll = new BScroll(bscrollDom, {})
-    // })
+    // this.selectedFood = $store.state.selectedFood
+  },
+  created () {
   }
 }
 </script>
@@ -88,11 +89,11 @@ export default {
       }
     }
   }
-  .shopcart{
-    width: 100%;
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-  }
+  // .shopcart{
+  //   width: 100%;
+  //   position: fixed;
+  //   bottom: 0px;
+  //   left: 0px;
+  // }
 }
 </style>

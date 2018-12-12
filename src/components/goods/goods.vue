@@ -1,5 +1,6 @@
 <template>
   <div class="goods">
+    <!-- 左侧菜单栏 -->
     <div
       class="menu-wrapper"
       ref="menuWrapper"
@@ -22,6 +23,7 @@
         </li>
       </ul>
     </div>
+    <!-- 右侧食物区 -->
     <div
       class="foods-wrapper"
       ref="foodsWrapper"
@@ -49,7 +51,7 @@
               </div>
               <div class="food-content">
                 <h2 class="food-name">{{food.name}}</h2>
-                <span v-show="food.description" class="food-description">{{food.description}}</span>
+                <!-- <span v-show="food.description" class="food-description">{{food.description}}</span> -->
                 <div class="food-sell">
                   <span class="sellCount">月售{{food.sellCount}}</span><span class="rating">好评率{{food.rating}}%</span>
                 </div>
@@ -61,9 +63,7 @@
                     ><i>￥</i>{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    <!-- <span class="reduce">-</span>
-                    <span class="count-number"></span>
-                    <span class="increase">+</span> -->
+                    <v-cartcontrol></v-cartcontrol>
                   </div>
                 </div>
               </div>
@@ -72,43 +72,51 @@
         </li>
       </ul>
     </div>
+    <v-shopcart
+      ref="shopcart"
+    ></v-shopcart>
   </div>
 </template>
 
 <script>
 // 导入 better-scroll 模块
 import BScroll from 'better-scroll'
+import cartcontrol from '@/components/cartcontrol/cartcontrol.vue'
+import shopcart from '@/components/shopcart/shopcart.vue'
 const errOk = 0 // 常量,方便解耦
 export default {
+  components: {
+    'v-cartcontrol': cartcontrol,
+    'v-shopcart': shopcart
+  },
   // name: 'goods',
   data () {
     return {
       goods: [], // 接收商品页的数据
       // classMap: [],
       listHeight: [], // 用来存储 foods区域的各个区块的高度(clientHeight)
-      scrollY: 0 // 用来存储foods区域的滚动的 y 坐标
+      scrollY: 0, // 用来存储foods区域的滚动的 y 坐标
+      selectedFood: {}, // 选择的商品
+      totalCount: 0
     }
   },
   // 接收数据
-  props: {
-    // seller: {
-    //   type: Object
-    // }
-  },
+  // props: {
+  //   seller: {
+  //     type: Object
+  //   }
+  // },
   created () {
+    // console.log(this.seller)
     // 计算左侧菜单栏的小图标,动态添加类来控制
-    (this.classMap = [
-      'decrease',
-      'discount',
-      'guarantee',
-      'invoice',
-      'special'
-    ])
+    this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special']
     // 当这个组件被调用时,发请求获取商品数据将数据赋值给goods
-    this.$http.get('/api/goods').then(response => { // '/api/goods/' 请求的是data.json 下的goods数组
+    this.$http.get('/api/goods').then(response => {
+      // '/api/goods/' 请求的是data.json 下的goods数组
       response = response.body
       if (response.errno === errOk) {
         this.goods = response.data
+        // console.log(this.goods)
         // 可以用 $nextTick(()=>{}) 来确保 Dom 变化后再执行一些事情
         this.$nextTick(() => {
           this._initScroll()
@@ -164,7 +172,9 @@ export default {
     // 计算 foods 内部块的高度
     _calculateHeight () {
       // 获取每一个 food 的dom
-      let foodList = this.$refs.foodsWrapper.getElementsByClassName('foodlist-list-hook')
+      let foodList = this.$refs.foodsWrapper.getElementsByClassName(
+        'foodlist-list-hook'
+      )
       let height = 0
       // 初始化第一个高度为 0
       this.listHeight.push(height)
@@ -177,9 +187,17 @@ export default {
       }
       // console.log(this.listHeight)
     },
+    // 选中的food
+    // selectFood (food, event) {
+    //   if (!event._constructed) {
+    //     return
+    //   }
+    //   this.selectedFood = food
+    //   this.$refs.food.show()
+    // },
     _drop (target) {
       this.$nextTick(() => {
-        this.$resf.shopcart.drop(target)
+        this.$refs.shopcart.drop(target)
       })
     }
   },
@@ -202,10 +220,24 @@ export default {
         }
       }
     }
-  },
-  mounted () {
-
+    // 获取被选中的 foods
+    // selectFoods () {
+    //   let foods = []
+    //   this.goods.forEach(good => {
+    //     good.foods.forEach(food => {
+    //       if (food.count) {
+    //         foods.push(food)
+    //       }
+    //     })
+    //   })
+    //   return foods
+    // }
   }
+  // event: {
+  //   'cart.add' (target) {
+  //     this._drop(target)
+  //   }
+  // }
 }
 </script>
 
@@ -233,7 +265,8 @@ export default {
         font-size: 0px;
         padding: 0px 12px;
         @include border-1px(rgba(7, 17, 27, 0.1));
-        &.current { /* 菜单选中的样式 */
+        &.current {
+          /* 菜单选中的样式 */
           position: relative;
           z-index: 10;
           margin-top: -1px;
@@ -295,6 +328,7 @@ export default {
             @include border-1px(rgba(7, 17, 27, 0.1));
             // .food-img{}
             .food-content {
+              width: 100%;
               padding-left: 10px;
               .food-name {
                 font-size: 14px;
@@ -302,7 +336,7 @@ export default {
                 color: rgb(7, 17, 27);
               }
               .food-description {
-                width: 90%;
+                // width: 90%;
                 display: block;
                 font-size: 10px;
                 line-height: 10px;
@@ -321,6 +355,7 @@ export default {
               .tool-wrapper {
                 width: 100%;
                 display: flex;
+                justify-content: space-between;
                 align-items: center;
                 .price {
                   .newPrice {
@@ -346,9 +381,6 @@ export default {
                   }
                 }
                 // .cartcontrol-wrapper{
-                // .reduce{}
-                // .count-number{}
-                // .increase{}
                 // }
               }
             }
