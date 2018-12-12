@@ -30,9 +30,9 @@
       <div class="comment-title">
         <h2>商品评价</h2>
         <div class="btn-wrapper">
-          <span class="all">全部57</span>
-          <span class="satisfaction">满意47</span>
-          <span class="unsatisfaction">不满意10</span>
+          <span class="all">全部<i>57</i></span>
+          <span class="satisfaction">满意<i>47</i></span>
+          <span class="unsatisfaction">不满意<i>10</i></span>
         </div>
         <div class="toggle">
           <span class="icon-check_circle"></span>只看有内容的评论
@@ -51,7 +51,7 @@
                     <span class="time" v-show="list.deliveryTime">{{list.deliveryTime}}分送达</span>
                   </div>
                 </div>
-                <div class="top-right">{{list.rateTime}}</div>
+                <div class="top-right">{{list.rateTime|formatdate()}}</div>
               </div>
               <div class="wrapper-middle">
                 {{list.text}}
@@ -112,6 +112,18 @@ export default {
         this.seller = response.data
       }
     })
+  },
+  filters: {
+    formatdate (rateTime) {
+      var date = new Date(rateTime)
+      var year = date.getFullYear()
+      var month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1)
+      var day = date.getDate()
+      var hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes()
+      var second = date.getSeconds()
+      return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+    }
   },
   components: {
     'v-star': star
@@ -236,6 +248,11 @@ export default {
           border-radius: 2px;
           &:nth-last-of-type(1){
             margin-right: 0px;
+          }
+          i{
+            font-style: normal;
+            font-size: 8px;
+            padding-left: 4px;
           }
         }
         .all{
