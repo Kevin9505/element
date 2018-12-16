@@ -39,6 +39,7 @@
             <li
               class="food-item border-1px"
               v-for="(food, index) in item.foods"
+              @click="handleSelectedFood(food,$event)"
               :key="index"
             >
               <div class="food-img">
@@ -63,7 +64,7 @@
                     ><i>￥</i>{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    <v-cartcontrol></v-cartcontrol>
+                    <v-cartcontrol :food="food"></v-cartcontrol>
                   </div>
                 </div>
               </div>
@@ -72,9 +73,12 @@
         </li>
       </ul>
     </div>
+    <!-- 购物车 -->
     <v-shopcart
       ref="shopcart"
     ></v-shopcart>
+    <!-- 商品详情 -->
+    <v-detail :food="selectedFood" ref="detail"></v-detail>
   </div>
 </template>
 
@@ -83,11 +87,13 @@
 import BScroll from 'better-scroll'
 import cartcontrol from '@/components/cartcontrol/cartcontrol.vue'
 import shopcart from '@/components/shopcart/shopcart.vue'
+import detail from '@/components/detail/detail.vue'
 const errOk = 0 // 常量,方便解耦
 export default {
   components: {
     'v-cartcontrol': cartcontrol,
-    'v-shopcart': shopcart
+    'v-shopcart': shopcart,
+    'v-detail': detail
   },
   // name: 'goods',
   data () {
@@ -188,13 +194,14 @@ export default {
       // console.log(this.listHeight)
     },
     // 选中的food
-    // selectFood (food, event) {
-    //   if (!event._constructed) {
-    //     return
-    //   }
-    //   this.selectedFood = food
-    //   this.$refs.food.show()
-    // },
+    handleSelectedFood (food, event) {
+      if (!event._constructed) {
+        return
+      }
+      // 赋值 -- 点击对应的商品的数据
+      this.selectedFood = food
+      this.$refs.detail.show()
+    },
     _drop (target) {
       this.$nextTick(() => {
         this.$refs.shopcart.drop(target)

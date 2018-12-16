@@ -56,27 +56,6 @@ export default {
   components: {
     'v-cartcontrol': cartcontrol
   },
-  // props: {
-  //   selectedFoods: {
-  //     type: Array,
-  //     default () {
-  //       return [
-  //         {
-  //           price: 10,
-  //           count: 1
-  //         }
-  //       ]
-  //     },
-  //     deliveryPrice: {
-  //       type: Number,
-  //       default: 0
-  //     },
-  //     minPrice: {
-  //       type: Number,
-  //       default: 0
-  //     }
-  //   }
-  // },
   data () {
     return {
       // 商品总数
@@ -84,25 +63,7 @@ export default {
       // 商品总价
       totalPrice: 10,
       listShow: false,
-      // fold: true,
-      // balls: [
-      //   {
-      //     show: false
-      //   },
-      //   {
-      //     show: false
-      //   },
-      //   {
-      //     show: false
-      //   },
-      //   {
-      //     show: false
-      //   },
-      //   {
-      //     show: false
-      //   }
-      // ],
-      // dropBalls: []
+      selectFoodData: [],
       // // 起送价
       minPrice: 20,
       // // 另需配送价
@@ -110,6 +71,10 @@ export default {
     }
   },
   computed: {
+    getSelectedFood () {
+      const selectFood = this.$store.selectedFood()
+      return selectFood
+    },
     // 总价
     // totalPrice () {
     //   let total = 0

@@ -94,21 +94,6 @@ export default {
       } else {
         this.scroll.refresh()
       }
-      // 初始化scroll区域
-      // this.sellerScroll = new BScroll(this.$refs.sellerScroll, {
-      //   click: true, // beeter-scroll 取消默认事件,我们这里再派发一个点击事件
-      //   probeType: 3 // beeter-scroll 探针
-      // })
-      // // 结合 BScroll 的接口使用,3实时派发scroll事件
-      // this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
-      //   click: true,
-      //   probeType: 3 // beeter-scroll 探针
-      // })
-      // 结合 BScroll 的接口使用,监听 scroll 事件(实时派发的),并获取鼠标的坐标
-      // this.sellerScroll.on('scroll', pos => {
-      //   // 滚动坐标会出现负的,并且是小数,所以需要处理一下
-      //   this.scrollY = Math.abs(Math.round(pos.y))
-      // })
     },
     // 计算商家图片
     _initPics () {
@@ -130,9 +115,10 @@ export default {
         })
       }
     },
-    toggleFavorite () {
-      const favorite = this.$store.state.favorite ? this.$store.state.favorite : this.$store.getters.getFavoriteStatus
-      if (favorite) {}
+    toggleFavorite (event) {
+      if (!event._constructed) {
+        return
+      }
       this.favorite = !this.favorite
       this.$store.dispatch('getFavoriteAction', this.favorite)
     }
@@ -151,17 +137,6 @@ export default {
       this._initScroll()
       this._initPics()
     }
-    // toggleFavorite () {
-    //   if (localStorage.getItem('seller-favorite')) {
-    //     this.favorite = localStorage.getItem('seller-favorite')
-    //     console.log(this.favorite)
-    //     return this.favorite
-    //   } else {
-    //     this.favorite = true
-    //     localStorage.setItem('seller-favorite', this.favorite)
-    //     return this.favorite
-    //   }
-    // }
   },
   mounted () {
     this.$http.get('/api/seller').then(response => {

@@ -15,7 +15,7 @@ const mutations = {
     // console.log(state)
     // console.log(value)
     state.selectedFood.push(value)
-    localStorage.setItem('selected', value)
+    localStorage.setItem('selectedFoods', value)
     // console.log(state.selectedFood)
   },
   getFavorite: (state, value) => {
@@ -27,10 +27,11 @@ const mutations = {
 // 存储触发 mutations 里面的函数的行为
 const actions = {
   getSelectFoodAction: ({commit}, value) => {
+    // console.log(value)
     commit('getSelectFood', value)
   },
   getFavoriteAction: ({commit}, value) => {
-    console.log(value)
+    // console.log(value)
     commit('getFavorite', value)
   }
 }
@@ -38,10 +39,10 @@ const actions = {
 // 属性封装 获取state中的数据
 const getters = {
   selectedFood: (state) => {
-    return localStorage.getItem('selected')
+    return localStorage.getItem('selectedFoods')
   },
   getFavoriteStatus: (state) => {
-    console.log(JSON.parse(localStorage.getItem('sellerFavorite')))
+    // console.log(JSON.parse(localStorage.getItem('sellerFavorite')))
     return JSON.parse(localStorage.getItem('sellerFavorite'))
   }
 }

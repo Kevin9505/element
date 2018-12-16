@@ -1,5 +1,5 @@
 <template>
-  <div class="cartcontrol" :selectedfoods="food">
+  <div class="cartcontrol">
     <div class="cart-add icon-remove_circle_outline" v-show="totalCount>0" @click.stop.prevent="decreaseCart"></div>
     <div class="cart-count" v-show="totalCount>0">{{totalCount}}</div>
     <div class="cart-reduce icon-add_circle" @click.stop.prevent="addCart(food, $event)"></div>
@@ -17,7 +17,8 @@ export default {
     return {
       // 添加商品的数量
       totalCount: 0,
-      selectedfoods: []
+      selectedfoods: [],
+      countSelectedFoods: []
     }
   },
   methods: {
@@ -27,7 +28,11 @@ export default {
         return false
       }
       this.totalCount++
-      this.$store.dispatch('getSelectFoodAction', food)
+      this.selectedfoods.push(food)
+      // console.log(this.selectedfoods)
+      this.$store.dispatch('getSelectFoodAction', this.selectedfoods)
+      // this.countSelectedFoods.push(this.selectedfoods)
+      // console.log(this.countSelectedFoods)
     },
     // 移除商品
     decreaseCart (event) {
@@ -43,7 +48,7 @@ export default {
 
   },
   created () {
-    console.log(this.food)
+    // console.log(this.food)
   }
 }
 </script>
