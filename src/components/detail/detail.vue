@@ -3,6 +3,7 @@
     <div
       v-show="showFlag"
       class="detail"
+      ref="detailwrapper"
     >
       <div class="detail-content">
         <div class="header-img">
@@ -29,12 +30,18 @@
             ><i>￥</i>{{food.oldPrice}}</span>
           </div>
         </div>
+        <div class="cartcontrol-wrapper">
+          <v-cartcontrol :food="food"></v-cartcontrol>
+        </div>
+        <div class="buy">加入购物车</div>
       </div>
     </div>
   </transition>
 </template>
 
 <script>
+import BScoll from 'better-scroll'
+import cartcontrol from '@/components/cartcontrol/cartcontrol.vue'
 export default {
   props: {
     // 接收good组件传过来的值
@@ -50,10 +57,22 @@ export default {
   methods: {
     show () {
       this.showFlag = true
+      this.$nextTick(() => {
+        if (!this.scroll) {
+          this.scroll = new BScoll(this.$refs.detailwrapper, {
+            click: true
+          })
+        } else {
+          this.scroll.refresh()
+        }
+      })
     },
     goBack () {
       this.showFlag = false
     }
+  },
+  components: {
+    'v-cartcontrol': cartcontrol
   }
 }
 </script>
@@ -147,6 +166,22 @@ export default {
           }
         }
       }
+    }
+    .cartcontrol-wrapper{
+      position: absolute;
+      right: 18px;
+      bottom: 20px;
+    }
+    .buy{
+      font-size: 10px;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 12px;
+      box-sizing: border-box;
+      background-color: rgb(0, 160, 220);
+      position: absolute;
+      right: 18px;
+      bottom: 20px;
     }
   }
 }
