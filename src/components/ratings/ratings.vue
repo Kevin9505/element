@@ -1,70 +1,70 @@
 <template>
   <div class="ratings" ref="ratingswrapper">
     <div class="ratings-wrapper">
-    <!-- 商家评分 -->
-    <div class="seller-info">
-      <div class="info-left">
-        <span class="rank-rate">{{seller.score}}</span>
-        <span class="synthesize">综合评分</span>
-        <span class="overtop">高于周边商家{{seller.rankRate}}%</span>
-      </div>
-      <div class="info-right">
-        <div class="server-wrapper">
-          <span class="server">服务态度</span>
-          <v-star :size="36" :score="seller.serviceScore"></v-star>
-          <span class="server-score">{{seller.serviceScore}}</span>
+      <!-- 商家评分 -->
+      <div class="seller-info">
+        <div class="info-left">
+          <span class="rank-rate">{{seller.score}}</span>
+          <span class="synthesize">综合评分</span>
+          <span class="overtop">高于周边商家{{seller.rankRate}}%</span>
         </div>
-        <div class="good-wrapper">
-          <span class="good">商品评分</span>
-          <v-star :size="36" :score="seller.foodScore"></v-star>
-          <span class="good-score">{{seller.foodScore}}</span>
-        </div>
-        <div class="time-wrapper">
-          <span class="time">送达时间</span>
-          <span class="deliveryTime">平均{{seller.deliveryTime}}分钟</span>
-        </div>
-      </div>
-    </div>
-    <!-- 客户评论区 -->
-    <div class="comments-wrapper">
-      <div class="comment-title">
-        <h2>商品评价</h2>
-        <div class="btn-wrapper">
-          <span class="all">全部<i>57</i></span>
-          <span class="satisfaction">满意<i>47</i></span>
-          <span class="unsatisfaction">不满意<i>10</i></span>
-        </div>
-        <div class="toggle">
-          <span class="icon-check_circle"></span>只看有内容的评论
+        <div class="info-right">
+          <div class="server-wrapper">
+            <span class="server">服务态度</span>
+            <v-star :size="36" :score="seller.serviceScore"></v-star>
+            <span class="server-score">{{seller.serviceScore}}</span>
+          </div>
+          <div class="good-wrapper">
+            <span class="good">商品评分</span>
+            <v-star :size="36" :score="seller.foodScore"></v-star>
+            <span class="good-score">{{seller.foodScore}}</span>
+          </div>
+          <div class="time-wrapper">
+            <span class="time">送达时间</span>
+            <span class="deliveryTime">平均{{seller.deliveryTime}}分钟</span>
+          </div>
         </div>
       </div>
-      <div class="comment-container" ref="commentcontainer">
-        <ul class="container" ref="container">
-          <li v-for="list in ratings" :key="list.index">
-            <img :src="list.avatar" width="28" height="28" alt="">
-            <div class="container-wrapper">
-              <div class="wrapper-top">
-                <div class="top-left">
-                  <span class="name">{{list.username}}</span>
-                  <div class="desc">
-                    <v-star :size="24" :score="list.score"></v-star>
-                    <span class="time" v-show="list.deliveryTime">{{list.deliveryTime}}分送达</span>
+      <!-- 客户评论区 -->
+      <div class="comments-wrapper">
+        <div class="comment-title">
+          <h2>商品评价</h2>
+          <div class="btn-wrapper">
+            <span class="all">全部<i>57</i></span>
+            <span class="satisfaction">满意<i>47</i></span>
+            <span class="unsatisfaction">不满意<i>10</i></span>
+          </div>
+          <div class="toggle">
+            <span class="icon-check_circle"></span>只看有内容的评论
+          </div>
+        </div>
+        <div class="comment-container" ref="commentcontainer">
+          <ul class="container" ref="container">
+            <li v-for="list in ratings" :key="list.index">
+              <img :src="list.avatar" width="28" height="28" alt="">
+              <div class="container-wrapper">
+                <div class="wrapper-top">
+                  <div class="top-left">
+                    <span class="name">{{list.username}}</span>
+                    <div class="desc">
+                      <v-star :size="24" :score="list.score"></v-star>
+                      <span class="time" v-show="list.deliveryTime">{{list.deliveryTime}}分送达</span>
+                    </div>
                   </div>
+                  <div class="top-right">{{list.rateTime|formatdate()}}</div>
                 </div>
-                <div class="top-right">{{list.rateTime|formatdate()}}</div>
+                <div class="wrapper-middle">
+                  {{list.text}}
+                </div>
+                <div class="wrapper-bottom">
+                  <span class="icon-thumb_up"></span>
+                  <span class="list" v-for="item in list.recommend.slice(0, 3)" :key="item.index">{{item}}</span>
+                </div>
               </div>
-              <div class="wrapper-middle">
-                {{list.text}}
-              </div>
-              <div class="wrapper-bottom">
-                <span class="icon-thumb_up"></span>
-                <span class="list" v-for="item in list.recommend.slice(0, 3)" :key="item.index">{{item}}</span>
-              </div>
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
     </div>
   </div>
 </template>
