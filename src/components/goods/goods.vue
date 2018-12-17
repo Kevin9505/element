@@ -39,7 +39,7 @@
             <li
               class="food-item border-1px"
               v-for="(food, index) in item.foods"
-              @click="handleSelectedFood(food,$event)"
+              @click="selectFood(food,$event)"
               :key="index"
             >
               <div class="food-img">
@@ -76,6 +76,10 @@
     <!-- 购物车 -->
     <v-shopcart
       ref="shopcart"
+      v-on:cart-add="cartAdd"
+      :select-foods="selectFoods"
+      :delivery-price="seller.deliveryPrice"
+      :min-price="seller.minPrice"
     ></v-shopcart>
     <!-- 商品详情 -->
     <v-detail :food="selectedFood" ref="detail"></v-detail>
@@ -102,16 +106,16 @@ export default {
       // classMap: [],
       listHeight: [], // 用来存储 foods区域的各个区块的高度(clientHeight)
       scrollY: 0, // 用来存储foods区域的滚动的 y 坐标
-      selectedFood: {}, // 选择的商品
-      totalCount: 0
+      selectedFood: {} // 选择的商品
+      // totalCount: 0
     }
   },
   // 接收数据
-  // props: {
-  //   seller: {
-  //     type: Object
-  //   }
-  // },
+  props: {
+    seller: {
+      type: Object
+    }
+  },
   created () {
     // console.log(this.seller)
     // 计算左侧菜单栏的小图标,动态添加类来控制
@@ -194,7 +198,7 @@ export default {
       // console.log(this.listHeight)
     },
     // 选中的food
-    handleSelectedFood (food, event) {
+    selectFood (food, event) {
       if (!event._constructed) {
         return
       }
@@ -203,6 +207,11 @@ export default {
       this.$refs.detail.show()
     },
     _drop (target) {
+      this.$nextTick(() => {
+        this.$refs.shopcart.drop(target)
+      })
+    },
+    cartAdd (target) {
       this.$nextTick(() => {
         this.$refs.shopcart.drop(target)
       })
@@ -226,25 +235,25 @@ export default {
           return i
         }
       }
-    }
+    },
     // 获取被选中的 foods
-    // selectFoods () {
-    //   let foods = []
-    //   this.goods.forEach(good => {
-    //     good.foods.forEach(food => {
-    //       if (food.count) {
-    //         foods.push(food)
-    //       }
-    //     })
-    //   })
-    //   return foods
-    // }
+    selectFoods () {
+      let foods = []
+      this.goods.forEach(good => {
+        good.foods.forEach(food => {
+          if (food.count) {
+            foods.push(food)
+          }
+        })
+      })
+      return foods
+    }
+  },
+  event: {
+    'cart.add' (target) {
+      this._drop(target)
+    }
   }
-  // event: {
-  //   'cart.add' (target) {
-  //     this._drop(target)
-  //   }
-  // }
 }
 </script>
 

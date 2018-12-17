@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router/index'
 import store from '@/store/store.js'
+// import store from '@/common/js/store.js'
 
 // 导入公共样式
 import './common/scss/index.scss'

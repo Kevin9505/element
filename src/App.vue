@@ -23,7 +23,7 @@
       </div>
     </div>
     <!-- </div> -->
-    <router-view />
+    <router-view :seller="seller" keep-alive />
     <!-- <v-shopcart
       :delivery-price="seller.deliveryPrice"
       :min-price="seller.minPrice"
