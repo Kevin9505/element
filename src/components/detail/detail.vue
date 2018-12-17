@@ -32,7 +32,7 @@
           <div class="cartcontrol-wrapper">
             <v-cartcontrol :food="food"></v-cartcontrol>
           </div>
-          <div class="buy" v-show="!food.count || food.count===0">加入购物车</div>
+          <div class="buy" @click.stop.prevent="addCart" v-show="!food.count || food.count===0">加入购物车</div>
         </div>
         <div class="ratings">
           <h1 class="ratings-title">商品介绍</h1>
@@ -77,6 +77,7 @@
 
 <script>
 import BScoll from 'better-scroll'
+import Vue from 'vue'
 import cartcontrol from '@/components/cartcontrol/cartcontrol.vue'
 export default {
   props: {
@@ -114,6 +115,16 @@ export default {
         })
       } else {
         this.scroll.refresh()
+      }
+    },
+    addCart (event) {
+      if (!event._constructed) {
+        return
+      }
+      if (!this.food.count) {
+        Vue.set(this.food, 'count', 1)
+      } else {
+        this.food.count++
       }
     }
   },
