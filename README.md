@@ -299,7 +299,9 @@ better-scroll 是移动端滚动的解决方案,它基于iscroll的重写,不仅
         this.data = res.data
         //  better-scroll 初始化 this.$nextTick(()=>{  }) 是异步函数
         this.$nextTick(() => {
-          this.scroll = new Bscroll(this.$refs.wrapper, {})
+          this.scroll = new Bscroll(this.$refs.wrapper, {
+            scrollX: true
+          })
         })
       })
     }
